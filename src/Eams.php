@@ -177,7 +177,7 @@ class Eams
                                 $key = strtolower($rows->item(0)->childNodes->item($tdIndex)->nodeValue);
                                 $key = str_replace('injured worker', '', $key);
                                 $key = str_replace(' ', '_', trim($key));
-                                $data['participants'][$rowIndex][$key] = $value;
+                                $data['participants'][$rowIndex - 1][$key] = $value;
                             }
                         }
                         break;
