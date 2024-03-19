@@ -13,5 +13,5 @@ composer require codewisdoms/eams
 
 ```php
 $eams = new \CodeWisdoms\Eams();
-$case_data = $eams->findByAdj('[ADJ NUMBER HERE]');
+$case_data = $eams->findByAdj([ADJ NUMBER HERE]);
 ```
