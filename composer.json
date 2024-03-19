@@ -1,0 +1,19 @@
+{
+  "name": "codewisdoms/eams",
+  "description": "A wrapper for EAMS injury search",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "CodeWisdoms\\Eams\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "CodeWisdoms"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": ">=1.0.0"
+  }
+}
