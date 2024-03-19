@@ -23,7 +23,7 @@ class Eams
      * @return array
      * @throws \Throwable
      */
-    public function findByAdj($adj_number) : array
+    public function findByAdj($adj_number): array
     {
         $response = $this->client->post(self::URL_INJURED_WORKER_FINDER, [
             'form_params' => [
@@ -161,15 +161,17 @@ class Eams
                         break;
                     }
                 case 2:{
-                        foreach ($rows as $rowIndex => $row) {
-                            foreach ($row->childNodes as $tdIndex => $col) {
-                                if ($tdIndex % 2 === 0) {
-                                    continue;
+                        if (stripos($rows->item(0)->firstChild->nodeValue, 'body part') !== false) {
+                            foreach ($rows as $rowIndex => $row) {
+                                foreach ($row->childNodes as $tdIndex => $col) {
+                                    if ($tdIndex % 2 === 0) {
+                                        continue;
+                                    }
+                                    $data['body_parts'][] = self::_decodeText($col->nodeValue);
                                 }
-                                $data['body_parts'][] = self::_decodeText($col->nodeValue);
                             }
+                            break;
                         }
-                        break;
                     }
                 case 3:{
                         foreach ($rows as $rowIndex => $row) {
