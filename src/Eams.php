@@ -1,5 +1,5 @@
 <?php
-namespace CodeWisdoms;
+namespace CodeWisdoms\Eams;
 
 use GuzzleHttp\Client;
 
