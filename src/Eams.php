@@ -68,9 +68,7 @@ class Eams
                     } else {
                         $value = $col->nodeValue;
                     }
-                    $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
-                    $key = str_replace('injured worker', '', $key);
-                    $key = str_replace(' ', '_', trim($key));
+                    $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
                     $data[$rowIndex - 1][$key] = $value;
                 }
             }
@@ -122,9 +120,7 @@ class Eams
                     if ($return_only_urls) {
                         $data[] = $value;
                     } else {
-                        $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
-                        $key = str_replace('injured worker', '', $key);
-                        $key = str_replace(' ', '_', trim($key));
+                        $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
                         $data[$index][$rowIndex][$key] = $value;
                     }
                 }
@@ -155,10 +151,14 @@ class Eams
                                     continue;
                                 }
                                 $value = self::_getValueFromDom($col);
-                                $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
-                                $key = str_replace('injured worker', '', $key);
-                                $key = str_replace(' ', '_', trim($key));
-                                $data[$key] = $value;
+                                $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
+                                if (@$data[$key]) {
+                                    if ($value) {
+                                        $data[$key] .= ', ' . $value;
+                                    }
+                                } else {
+                                    $data[$key] = $value;
+                                }
                             }
                         }
                         break;
@@ -188,9 +188,7 @@ class Eams
                                     continue;
                                 }
                                 $value = self::_getValueFromDom($col);
-                                $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
-                                $key = str_replace('injured worker', '', $key);
-                                $key = str_replace(' ', '_', trim($key));
+                                $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
                                 $data['participants'][$rowIndex - 1][$key] = $value;
                             }
                         }
@@ -217,6 +215,13 @@ class Eams
         } else {
             return self::_decodeText($col->nodeValue);
         }
+    }
+    private static function _getKeyFromDom(\DOMNode $col): string
+    {
+        $key = strtolower($col->nodeValue);
+        $key = str_replace('injured worker', '', $key);
+        $key = str_replace(' ', '_', trim($key));
+        return $key;
     }
     private static function _decodeText(string $text)
     {
