@@ -16,24 +16,14 @@ class Eams
         $this->initRequest();
         $this->captureInfo();
     }
-    private function initRequest()
-    {
-        return $this->client->get('');
-    }
-    private function captureInfo()
-    {
-        return $this->client->post(self::URL_INFORMATION_CAPTURE, [
-            'form_params' => [
-                'requesterFirstName' => 'test',
-                'requesterLastName' => 'tEST',
-                'UAN' => '',
-                'email' => 'admin@admin.com',
-                'reason' => 'APPORTIONMENT',
-                'action' => 'Next',
-            ],
-        ]);
-    }
-    public function findByAdj($adj_number)
+    /**
+     * Find EAMS record by ADJ number
+     *
+     * @param string|int $adj_number
+     * @return array
+     * @throws \Throwable
+     */
+    public function findByAdj($adj_number) : array
     {
         $response = $this->client->post(self::URL_INJURED_WORKER_FINDER, [
             'form_params' => [
@@ -85,6 +75,23 @@ class Eams
             }
         }
         return $data;
+    }
+    private function initRequest()
+    {
+        return $this->client->get('');
+    }
+    private function captureInfo()
+    {
+        return $this->client->post(self::URL_INFORMATION_CAPTURE, [
+            'form_params' => [
+                'requesterFirstName' => 'test',
+                'requesterLastName' => 'tEST',
+                'UAN' => '',
+                'email' => 'admin@admin.com',
+                'reason' => 'APPORTIONMENT',
+                'action' => 'Next',
+            ],
+        ]);
     }
     private function getUrlInfo(string $url, bool $return_only_urls = false): array
     {
