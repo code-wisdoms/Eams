@@ -50,7 +50,8 @@ class Eams
                 if ($rowIndex < 1) {
                     continue;
                 }
-                foreach ($row->childNodes as $tdIndex => $col) {
+                $cols = $row->getElementsByTagName('td');
+                foreach ($cols as $tdIndex => $col) {
                     $value = '';
                     if ($col->hasChildNodes() && $col->lastChild->nodeName == 'a') {
                         $col = $col->lastChild;
@@ -67,7 +68,7 @@ class Eams
                     } else {
                         $value = $col->nodeValue;
                     }
-                    $key = strtolower($rows->item(0)->childNodes->item($tdIndex)->nodeValue);
+                    $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
                     $key = str_replace('injured worker', '', $key);
                     $key = str_replace(' ', '_', trim($key));
                     $data[$rowIndex - 1][$key] = $value;
@@ -104,7 +105,8 @@ class Eams
         foreach ($elems as $index => $table) {
             $rows = $table->getElementsByTagName('tr');
             foreach ($rows as $rowIndex => $row) {
-                foreach ($row->childNodes as $tdIndex => $col) {
+                $cols = $row->getElementsByTagName('td');
+                foreach ($cols as $tdIndex => $col) {
                     $value = '';
                     if ($col->hasChildNodes() && $col->lastChild->nodeName == 'a') {
                         $col = $col->lastChild;
@@ -120,7 +122,7 @@ class Eams
                     if ($return_only_urls) {
                         $data[] = $value;
                     } else {
-                        $key = strtolower($rows->item(0)->childNodes->item($tdIndex)->nodeValue);
+                        $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
                         $key = str_replace('injured worker', '', $key);
                         $key = str_replace(' ', '_', trim($key));
                         $data[$index][$rowIndex][$key] = $value;
@@ -147,12 +149,13 @@ class Eams
                             if ($rowIndex < 1) {
                                 continue;
                             }
-                            foreach ($row->childNodes as $tdIndex => $col) {
-                                if (!trim($rows->item(0)->childNodes->item($tdIndex)->nodeValue)) {
+                            $cols = $row->getElementsByTagName('td');
+                            foreach ($cols as $tdIndex => $col) {
+                                if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
                                     continue;
                                 }
                                 $value = self::_getValueFromDom($col);
-                                $key = strtolower($rows->item(0)->childNodes->item($tdIndex)->nodeValue);
+                                $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
                                 $key = str_replace('injured worker', '', $key);
                                 $key = str_replace(' ', '_', trim($key));
                                 $data[$key] = $value;
@@ -163,7 +166,8 @@ class Eams
                 case 2:{
                         if (stripos($rows->item(0)->firstChild->nodeValue, 'body part') !== false) {
                             foreach ($rows as $rowIndex => $row) {
-                                foreach ($row->childNodes as $tdIndex => $col) {
+                                $cols = $row->getElementsByTagName('td');
+                                foreach ($cols as $tdIndex => $col) {
                                     if ($tdIndex % 2 === 0) {
                                         continue;
                                     }
@@ -178,12 +182,13 @@ class Eams
                             if ($rowIndex < 1) {
                                 continue;
                             }
-                            foreach ($row->childNodes as $tdIndex => $col) {
-                                if (!trim($rows->item(0)->childNodes->item($tdIndex)->nodeValue)) {
+                            $cols = $row->getElementsByTagName('td');
+                            foreach ($cols as $tdIndex => $col) {
+                                if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
                                     continue;
                                 }
                                 $value = self::_getValueFromDom($col);
-                                $key = strtolower($rows->item(0)->childNodes->item($tdIndex)->nodeValue);
+                                $key = strtolower(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue);
                                 $key = str_replace('injured worker', '', $key);
                                 $key = str_replace(' ', '_', trim($key));
                                 $data['participants'][$rowIndex - 1][$key] = $value;
@@ -216,5 +221,9 @@ class Eams
     private static function _decodeText(string $text)
     {
         return trim(str_replace('&nbsp;', ' ', htmlentities($text)));
+    }
+    private static function _getHeaderFromRow(\DOMNodeList $list)
+    {
+        return $list->item(0)->getElementsByTagName('th');
     }
 }
