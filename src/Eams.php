@@ -226,7 +226,7 @@ class Eams
                 foreach ($cols as $tdIndex => $col) {
                     $value = self::_getValueFromDom($col);
                     $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
-                    $data[$rowIndex - 1][$tdIndex][$key] = $value;
+                    $data[$rowIndex - 1][$key] = $value;
                 }
             }
         }
