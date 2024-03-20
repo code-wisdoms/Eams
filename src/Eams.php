@@ -230,7 +230,7 @@ class Eams
     }
     private static function _decodeText(string $text)
     {
-        return trim(str_replace('&nbsp;', ' ', htmlentities($text)));
+        return preg_replace('#\s{2,}#', ', ', trim(str_replace('&nbsp;', ' ', htmlentities($text))));
     }
     private static function _getHeaderFromRow(\DOMNodeList $list)
     {
