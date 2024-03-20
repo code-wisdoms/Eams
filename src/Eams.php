@@ -138,67 +138,62 @@ class Eams
         $data = [];
         foreach ($elems as $index => $table) {
             $rows = $table->getElementsByTagName('tr');
-            switch ($index) {
-                case 0:
-                case 1:{
-                        foreach ($rows as $rowIndex => $row) {
-                            if ($rowIndex < 1) {
-                                continue;
-                            }
-                            $cols = $row->getElementsByTagName('td');
-                            foreach ($cols as $tdIndex => $col) {
-                                if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
-                                    continue;
-                                }
-                                $value = self::_getValueFromDom($col);
-                                $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
-                                if (@$data[$key]) {
-                                    if ($value) {
-                                        $data[$key] .= ', ' . $value;
-                                    }
-                                } else {
-                                    $data[$key] = $value;
-                                }
-                            }
+            $matches = [];
+            if (preg_match('#body\s+part#i', $rows->item(0)->firstChild->nodeValue) === 1) {
+                foreach ($rows as $rowIndex => $row) {
+                    $cols = $row->getElementsByTagName('td');
+                    foreach ($cols as $tdIndex => $col) {
+                        if ($tdIndex % 2 === 0) {
+                            continue;
                         }
-                        break;
+                        $data['body_parts'][] = self::_decodeText($col->nodeValue);
                     }
-                case 2:{
-                        if (stripos($rows->item(0)->firstChild->nodeValue, 'body part') !== false) {
-                            foreach ($rows as $rowIndex => $row) {
-                                $cols = $row->getElementsByTagName('td');
-                                foreach ($cols as $tdIndex => $col) {
-                                    if ($tdIndex % 2 === 0) {
-                                        continue;
-                                    }
-                                    $data['body_parts'][] = self::_decodeText($col->nodeValue);
-                                }
+                }
+            } elseif (preg_match('#(.*hearing.*)|(.*participant.*)#is', $rows->item(0)->firstChild->nodeValue, $matches) === 1) {
+                $key_main = '';
+                $matches = implode(' ', $matches);
+                if (stripos($matches, 'hearing') !== false) {
+                    $key_main = 'hearing_detail';
+                } elseif (stripos($matches, 'participant') !== false) {
+                    $key_main = 'participants';
+                } else {
+                    $key_main = 'misc';
+                }
+                foreach ($rows as $rowIndex => $row) {
+                    if ($rowIndex < 1) {
+                        continue;
+                    }
+                    $cols = $row->getElementsByTagName('td');
+                    foreach ($cols as $tdIndex => $col) {
+                        if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
+                            continue;
+                        }
+                        $value = self::_getValueFromDom($col);
+                        $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
+                        $data[$key_main][$rowIndex - 1][$key] = $value;
+                    }
+                }
+            } else {
+                foreach ($rows as $rowIndex => $row) {
+                    if ($rowIndex < 1) {
+                        continue;
+                    }
+                    $cols = $row->getElementsByTagName('td');
+                    foreach ($cols as $tdIndex => $col) {
+                        if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
+                            continue;
+                        }
+                        $value = self::_getValueFromDom($col);
+                        $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
+                        if (@$data[$key]) {
+                            if ($value) {
+                                $data[$key] .= ', ' . $value;
                             }
-                            break;
+                        } else {
+                            $data[$key] = $value;
                         }
                     }
-                case 3:
-                case 4:{
-                        if ($index === 4 && @$data['participants']) {
-                            $data['hearing_detail'] = $data['participants'];
-                            $data['participants'] = [];
-                        }
-                        foreach ($rows as $rowIndex => $row) {
-                            if ($rowIndex < 1) {
-                                continue;
-                            }
-                            $cols = $row->getElementsByTagName('td');
-                            foreach ($cols as $tdIndex => $col) {
-                                if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
-                                    continue;
-                                }
-                                $value = self::_getValueFromDom($col);
-                                $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
-                                $data['participants'][$rowIndex - 1][$key] = $value;
-                            }
-                        }
-                        break;
-                    }
+                }
             }
         }
         return $data;
