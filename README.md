@@ -12,6 +12,6 @@ composer require codewisdoms/eams
 # Example request
 
 ```php
-$eams = new \CodeWisdoms\Eams();
+$eams = new \CodeWisdoms\Eams\Eams();
 $case_data = $eams->findByAdj([ADJ NUMBER HERE]);
 ```
