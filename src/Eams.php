@@ -77,7 +77,7 @@ class Eams
     }
     private function initRequest()
     {
-        return $this->client->get('');
+        return $this->client->head('');
     }
     private function captureInfo()
     {
