@@ -177,7 +177,12 @@ class Eams
                             break;
                         }
                     }
-                case 3:{
+                case 3:
+                case 4:{
+                        if ($index === 4 && @$data['participants']) {
+                            $data['hearing_detail'] = $data['participants'];
+                            $data['participants'] = [];
+                        }
                         foreach ($rows as $rowIndex => $row) {
                             if ($rowIndex < 1) {
                                 continue;
@@ -220,7 +225,7 @@ class Eams
     {
         $key = strtolower($col->nodeValue);
         $key = str_replace('injured worker', '', $key);
-        $key = str_replace(' ', '_', trim($key));
+        $key = str_replace([' ', '/', '\\'], '_', trim($key));
         return $key;
     }
     private static function _decodeText(string $text)
