@@ -146,7 +146,13 @@ class Eams
                         if ($tdIndex % 2 === 0) {
                             continue;
                         }
-                        $data['body_parts'][] = self::_decodeText($col->nodeValue);
+                        $val = self::_decodeText($col->nodeValue);
+                        $vals = explode(' ', $val);
+                        $val = array_shift($vals);
+                        $data['body_parts'][] = [
+                            'code' => $val,
+                            'detail' => implode(' ', $vals),
+                        ];
                     }
                 }
             } elseif (preg_match('#(.*hearing.*)|(.*participant.*)#is', $rows->item(0)->firstChild->nodeValue, $matches) === 1) {
