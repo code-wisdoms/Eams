@@ -151,7 +151,7 @@ class Eams
                         if (is_numeric($vals[0])) {
                             $val = intval(array_shift($vals));
                         } else {
-                            $val = '';
+                            $val = null;
                         }
                         $data['body_parts'][] = [
                             'code' => $val,
