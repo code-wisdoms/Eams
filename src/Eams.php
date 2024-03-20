@@ -148,7 +148,11 @@ class Eams
                         }
                         $val = self::_decodeText($col->nodeValue);
                         $vals = explode(' ', $val);
-                        $val = array_shift($vals);
+                        if (is_numeric($vals[0])) {
+                            $val = intval(array_shift($vals));
+                        } else {
+                            $val = '';
+                        }
                         $data['body_parts'][] = [
                             'code' => $val,
                             'detail' => implode(' ', $vals),
