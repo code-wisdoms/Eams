@@ -23,7 +23,7 @@ class Eams
      * @return array
      * @throws \Throwable
      */
-    public function findByAdj($adj_number): array
+    public function findByAdj($adj_number, array $expand = ['case']): array
     {
         $response = $this->client->post(self::URL_INJURED_WORKER_FINDER, [
             'form_params' => [
@@ -55,12 +55,12 @@ class Eams
                     $value = '';
                     if ($col->hasChildNodes() && $col->lastChild->nodeName == 'a') {
                         $col = $col->lastChild;
-                        if ($col->attributes->getNamedItem('href')) {
+                        if ($col->attributes->getNamedItem('href') && in_array('case', $expand)) {
                             $urls = $this->getUrlInfo($col->attributes->getNamedItem('href')->nodeValue, true);
 
                             $value = [];
                             foreach ($urls as $url) {
-                                $value[] = $this->getCaseDetails($url);
+                                $value[] = $this->getCaseDetails($url, in_array('events', $expand));
                             }
                             $data[$rowIndex - 1]['details'] = $value;
                             continue;
@@ -128,7 +128,7 @@ class Eams
         }
         return $data;
     }
-    private function getCaseDetails(string $url): array
+    private function getCaseDetails(string $url, bool $include_events = false): array
     {
         $response = $this->client->get($url);
 
@@ -181,6 +181,12 @@ class Eams
                     $cols = $row->getElementsByTagName('td');
                     foreach ($cols as $tdIndex => $col) {
                         if (!trim(self::_getHeaderFromRow($rows)->item($tdIndex)->nodeValue)) {
+                            if ($include_events) {
+                                $url = self::_getValueFromDom($col);
+                                if (stripos($url, 'CaseEventFinder') !== false) {
+                                    $data['events'] = $this->getEventDetails($url);
+                                }
+                            }
                             continue;
                         }
                         $value = self::_getValueFromDom($col);
@@ -193,6 +199,34 @@ class Eams
                             $data[$key] = $value;
                         }
                     }
+                }
+            }
+        }
+        return $data;
+    }
+    private function getEventDetails(string $url): array
+    {
+        $response = $this->client->get($url);
+
+        $dom = new \DOMDocument();
+        $dom->loadHTML($response->getBody()->getContents());
+        $elems = $dom->getElementsByTagName('table');
+        $data = [];
+        foreach ($elems as $index => $table) {
+            if ($index < 1) {
+                continue;
+            }
+            $rows = $table->getElementsByTagName('tr');
+
+            foreach ($rows as $rowIndex => $row) {
+                if ($rowIndex < 1) {
+                    continue;
+                }
+                $cols = $row->getElementsByTagName('td');
+                foreach ($cols as $tdIndex => $col) {
+                    $value = self::_getValueFromDom($col);
+                    $key = self::_getKeyFromDom(self::_getHeaderFromRow($rows)->item($tdIndex));
+                    $data[$rowIndex - 1][$tdIndex][$key] = $value;
                 }
             }
         }
