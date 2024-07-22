@@ -89,11 +89,13 @@ class Eams
     {
         return $this->client->post(self::URL_INFORMATION_CAPTURE, [
             'form_params' => [
-                'requesterFirstName' => $this->init_params['firstName'] ?? 'test',
-                'requesterLastName' => $this->init_params['lastName'] ?? 'test',
-                'UAN' => $this->init_params['uan'] ?? '',
-                'email' => $this->init_params['email'] ?? 'admin@admin.com',
-                'reason' => $this->init_params['reason'] ?? 'APPORTIONMENT',
+                'name' => '',
+                'email' => '',
+                'fnam' => $this->init_params['firstName'] ?? 'test',
+                'lname' => $this->init_params['lastName'] ?? 'test',
+                'uniformAN' => $this->init_params['uan'] ?? '',
+                'em' => $this->init_params['email'] ?? 'admin@admin.com',
+                'reasonForReq' => $this->init_params['reason'] ?? 'APPORTIONMENT',
                 'action' => 'Next',
             ],
         ]);
