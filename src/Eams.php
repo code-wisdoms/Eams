@@ -11,9 +11,9 @@ class Eams
     private const URL_INJURED_WORKER_FINDER = 'InjuredWorkerFinder';
     private $init_params = [];
 
-    public function __construct(array $init_params = [])
+    public function __construct(array $init_params = [], bool $verify = false)
     {
-        $this->client = new Client(['base_uri' => self::BASE_URL, 'cookies' => true]);
+        $this->client = new Client(['base_uri' => self::BASE_URL, 'cookies' => true, 'verify' => $verify]);
         $this->init_params = $init_params;
         $this->initRequest();
         $this->captureInfo();
