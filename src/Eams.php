@@ -87,14 +87,19 @@ class Eams
                     $value = '';
                     if ($col->hasChildNodes() && $col->lastChild->nodeName == 'a') {
                         $col = $col->lastChild;
-                        if ($col->attributes->getNamedItem('href') && in_array('case', $expand)) {
-                            $urls = $this->getUrlInfo($col->attributes->getNamedItem('href')->nodeValue, true);
+                        if ($col->attributes->getNamedItem('href')) {
+                            if (in_array('basic', $expand)) {
+                                $patient_info = $this->getUrlInfo($col->attributes->getNamedItem('href')->nodeValue);
+                                $data[$rowIndex - 1]['details'] = self::flattenArray($patient_info);
+                            } elseif (in_array('case', $expand)) {
+                                $urls = $this->getUrlInfo($col->attributes->getNamedItem('href')->nodeValue, true);
 
-                            $value = [];
-                            foreach ($urls as $url) {
-                                $value[] = $this->getCaseDetails($url, in_array('events', $expand));
+                                $value = [];
+                                foreach ($urls as $url) {
+                                    $value[] = $this->getCaseDetails($url, in_array('events', $expand));
+                                }
+                                $data[$rowIndex - 1]['details'] = $value;
                             }
-                            $data[$rowIndex - 1]['details'] = $value;
                             continue;
                         }
                     } else {
@@ -308,5 +313,27 @@ class Eams
     private static function _getHeaderFromRow(\DOMNodeList $list)
     {
         return $list->item(0)->getElementsByTagName('th');
+    }
+    private static function flattenArray(array $array): array
+    {
+        $result = [];
+
+        if (self::hasNumericKeys($array)) {
+            $array = array_values($array);
+        }
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = array_merge($result, self::flattenArray($value));
+            } else {
+                $result[$key] = trim($value);
+            }
+        }
+
+        return $result;
+    }
+    private static function hasNumericKeys($array)
+    {
+        return count(array_filter(array_keys($array), fn($k) => is_numeric($k))) > 0;
     }
 }
