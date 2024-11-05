@@ -38,7 +38,33 @@ class Eams
                 'action' => "Search",
             ],
         ]);
-
+        return $this->handleResponse($response, $expand);
+    }
+    /**
+     * Find EAMS record by name
+     *
+     * @param string $first_name
+     * @param string $last_name
+     * @return array
+     * @throws \Throwable
+     */
+    public function findByName($first_name, $last_name, array $expand = ['case']): array
+    {
+        $response = $this->client->post(self::URL_INJURED_WORKER_FINDER, [
+            'form_params' => [
+                'caseNumber' => '',
+                'firstName' => $first_name,
+                'lastName' => $last_name,
+                'dateOfBirth' => '',
+                'city' => '',
+                'zipCode' => '',
+                'action' => "Search",
+            ],
+        ]);
+        return $this->handleResponse($response, $expand);
+    }
+    private function handleResponse(\Psr\Http\Message\ResponseInterface $response, array $expand): array
+    {
         $dom = new \DOMDocument();
 
         libxml_use_internal_errors(true);
