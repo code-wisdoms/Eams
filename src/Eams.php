@@ -2,10 +2,13 @@
 namespace CodeWisdoms\Eams;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 
 class Eams
 {
     private $client = null;
+    private $jar = null;
     private const BASE_URL = 'https://eams.dwc.ca.gov/WebEnhancement/';
     private const URL_INFORMATION_CAPTURE = 'InformationCapture';
     private const URL_INJURED_WORKER_FINDER = 'InjuredWorkerFinder';
@@ -13,9 +16,30 @@ class Eams
 
     public function __construct(array $init_params = [], bool $verify = false)
     {
-        $this->client = new Client(['base_uri' => self::BASE_URL, 'cookies' => true, 'verify' => $verify]);
+        $this->jar = new CookieJar();
+        $this->client = new Client(['base_uri' => self::BASE_URL, 'cookies' => $this->jar, 'verify' => $verify]);
         $this->init_params = $init_params;
         $this->initRequest();
+
+        if (@$init_params['session_id']) {
+            if ($cookie = $this->jar->getCookieByName('JSESSIONID')) {
+                // Clone the existing cookie and modify it
+                $updatedCookie = new SetCookie([
+                    'Name' => $cookie->getName(),
+                    'Value' => $init_params['session_id'],
+                    'Domain' => $cookie->getDomain(),
+                    'Path' => $cookie->getPath(),
+                    'Expires' => $cookie->getExpires(),
+                    'Secure' => $cookie->getSecure(),
+                    'Discard' => $cookie->getDiscard(),
+                    'HttpOnly' => $cookie->getHttpOnly(),
+                ]);
+
+                // Add the updated cookie back to the CookieJar
+                $this->jar->setCookie($updatedCookie);
+            }
+        }
+
         $this->captureInfo();
     }
     /**
