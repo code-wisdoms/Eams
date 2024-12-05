@@ -38,9 +38,10 @@ class Eams
                 // Add the updated cookie back to the CookieJar
                 $this->jar->setCookie($updatedCookie);
             }
+        } else {
+            $this->captureInfo();
         }
 
-        $this->captureInfo();
     }
     /**
      * Find EAMS record by ADJ number
